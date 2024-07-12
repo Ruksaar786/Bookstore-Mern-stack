@@ -1,5 +1,5 @@
-import express from "express";
-import { PORT, mongoDBURL } from "./config.js";
+import express, { json } from "express";
+import { PORT, DATABASE_URL } from "./config.js";
 import mongoose from "mongoose";
 import booksRoute from "./routes/booksRoute.js";
 import cors from "cors";
@@ -13,13 +13,13 @@ app.use(express.json());
 // Option 1: Allow All Origins with Default of cors(*)
 app.use(cors());
 // Option 2: Allow Custom Origins
-// app.use(
-//   cors({
-//     origin: 'http://localhost:3000',
-//     methods: ['GET', 'POST', 'PUT', 'DELETE'],
-//     allowedHeaders: ['Content-Type'],
-//   })
-// );
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type"],
+  })
+);
 
 app.get("/", (request, response) => {
   console.log(request);
@@ -29,10 +29,10 @@ app.get("/", (request, response) => {
 app.use("/books", booksRoute);
 
 mongoose
-  .connect(mongoDBURL)
+  .connect(DATABASE_URL)
   .then(() => {
     console.log("App connected to database");
-    app.listen(PORT, () => {
+    app.listen(PORT, (request, response) => {
       console.log(`App is listening to port: ${PORT}`);
     });
   })
