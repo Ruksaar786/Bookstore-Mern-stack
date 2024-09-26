@@ -1,41 +1,29 @@
-import express from "express";
-import { PORT, DATABASE_URL } from "./config.js";
-import mongoose from "mongoose";
-import booksRoute from "./routes/booksRoute.js";
+import express, { json } from "express";
 import cors from "cors";
+import { PORT, DATABASE_URL } from "./config.js";
+import bookRouter from "./routes/bookRoute.js";
+import mongoose from "mongoose";
 
 const app = express();
 
-// Middleware for parsing request body
-app.use(express.json());
+// app.use(cors()); // cross platform communication is allowed default way
+// 2.allow custom origin
 
-// Middleware for handling CORS POLICY
-// Option 1: Allow All Origins with Default of cors(*)
-app.use(cors());
-// Option 2: Allow Custom Origins
 app.use(
   cors({
-    origin: ["http://localhost:5173"],
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     allowedHeaders: ["Content-Type"],
   })
 );
-
-app.get("/", (request, response) => {
-  console.log(request);
-  return response.status(234).send("Welcome To MERN Stack Tutorial");
-});
-
-app.use("/books", booksRoute);
-
+app.use(express.json()); // to format json data
+app.use("/books", bookRouter);
 mongoose
   .connect(DATABASE_URL)
   .then(() => {
-    console.log("App connected to database");
-    app.listen(PORT, () => {
-      console.log(`App is listening to port: ${PORT}`);
+    console.log("Mongo db connected");
+    app.listen(PORT, (req, res) => {
+      console.log("Server is running in port", PORT);
     });
   })
-  .catch((error) => {
-    console.log(error);
-  });
+  .catch((error) => console.log(error));
